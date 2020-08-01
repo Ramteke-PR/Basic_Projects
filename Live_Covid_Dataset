@@ -1,0 +1,56 @@
+import bs4
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import time
+import datetime
+
+website='https://news.google.com/covid19/map?hl=en-IN&mid=%2Fm%2F03rk0&gl=IN&ceid=IN%3Aen'
+website_url = requests.get(website)
+soup = BeautifulSoup(website_url.text,'lxml')
+my_table = soup.find('tbody')
+table_data = []
+
+def Covid_dataset():
+    
+    my_table = soup.find('tbody')
+    table_data = []
+    for row in my_table.findAll('tr'):
+        row_data = []    
+        for cell in row.findAll('td'):
+            row_data.append(cell.text)    
+        if(len(row_data) > 0):
+            data_item = {
+                     "Confirmed": row_data[0],
+                     #"New cases (last 60 days)": row_data[2],
+                     "Cases per 1 million people": row_data[2],
+                     "Recovered": row_data[3],
+                     "Deaths": row_data[4]
+                    }
+            table_data.append(data_item)
+
+        states = soup.find("tbody")
+    table1_data = []
+    for row in states.findAll("tr"):
+        row_data = []
+    
+        for cell in row.findAll("div",{'class':'TWa0lb'}):
+            row_data.append(cell.text)
+        
+        if(len(row_data)>0):
+            states = row_data[0]
+    
+        table1_data.append(states)
+
+    df = pd.DataFrame(table_data)
+    df["Location"] = table1_data
+    df.to_csv("COVID_LIVE_DATASET.csv")
+    print("DATA SAVED")
+    return df
+
+
+while(True):
+    print(datetime.datetime.now())
+    print(Covid_dataset())
+    time.sleep(60)
+
