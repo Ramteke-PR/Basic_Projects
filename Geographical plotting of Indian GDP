@@ -13,7 +13,7 @@ for row in table.find_all("tr"):
     row_data = []
     for cell in row.find_all("td"):
         row_data.append(cell.text)
-    if(len(row_data)>0):a
+    if(len(row_data)>0):
         data_item = {"state": row_data[1],
                     "GDP" : row_data[5]
                     }
